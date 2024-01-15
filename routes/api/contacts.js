@@ -5,6 +5,7 @@ const {
   removeContact,
   addContact,
   updateContact,
+  updateStatusContact,
 } = require("../../models/contacts");
 
 const postSchema = require("../../schemas/conacts-schemas");
@@ -36,7 +37,7 @@ router.post("/", jsonParser, async (req, res, next) => {
   }
   const data = await addContact(req.body);
   if (data !== null) {
-    res.status(200).send(data);
+    res.status(201).send(data);
   } else {
     next();
   }
@@ -61,6 +62,22 @@ router.put("/:contactId", jsonParser, async (req, res, next) => {
     res.status(400).send({ message: "missing fields" });
   }
   const data = await updateContact(req.params.contactId, req.body);
+  if (data !== null) {
+    res.status(200).send(data);
+  } else {
+    next();
+  }
+});
+
+router.patch("/:contactId/favorite", jsonParser, async (req, res, next) => {
+  if (
+    req.body === "" ||
+    Object.keys(req.body).length === 0 ||
+    req.body === undefined
+  ) {
+    res.status(400).send({ message: "missing field favorite" });
+  }
+  const data = await updateStatusContact(req.params.contactId, req.body);
   if (data !== null) {
     res.status(200).send(data);
   } else {
