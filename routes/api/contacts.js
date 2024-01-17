@@ -75,7 +75,7 @@ router.patch("/:contactId/favorite", jsonParser, async (req, res, next) => {
     Object.keys(req.body).length === 0 ||
     req.body === undefined
   ) {
-    res.status(400).send({ message: "missing field favorite" });
+    return res.status(400).send({ message: "missing field favorite" });
   }
   const data = await updateStatusContact(req.params.contactId, req.body);
   if (data !== null) {
