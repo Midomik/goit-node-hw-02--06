@@ -1,74 +1,106 @@
+const postSchema = require("../schemas/conacts-schemas");
 const Contact = require("../models/contactsSchema");
 
-const listContacts = async () => {
+const listContacts = async (req, res, next) => {
   try {
     const data = await Contact.find();
-    return data;
+    if (data !== null) {
+      res.status(200).send(data);
+    } else {
+      next();
+    }
   } catch (error) {
     console.log(error);
   }
 };
 
-const getContactById = async (contactId) => {
+const getContactById = async (req, res, next) => {
   try {
+    const { contactId } = req.params;
     const data = await Contact.findById(contactId);
-    return data;
+    if (data !== null) {
+      res.status(200).send(data);
+    } else {
+      next();
+    }
   } catch (error) {
     console.log(error);
   }
 };
 
-const removeContact = async (contactId) => {
+const addContact = async (req, res, next) => {
   try {
+    const response = postSchema.validate(req.body, { abortEarly: false });
+    if (typeof response.error !== "undefined") {
+      return res
+        .status(400)
+        .send(response.error.details.map((err) => err.message).join(", "));
+    }
+
+    const data = await Contact.create(req.body);
+    if (data !== null) {
+      res.status(201).send(data);
+    } else {
+      next();
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const removeContact = async (req, res, next) => {
+  try {
+    const { contactId } = req.params;
     const data = await Contact.findByIdAndDelete(contactId);
-    return data;
+    if (data !== null) {
+      res.status(200).send(data);
+    } else {
+      next();
+    }
   } catch (error) {
     console.log(error);
   }
 };
 
-const addContact = async (body) => {
+const updateContact = async (req, res, next) => {
   try {
-    const { name, email, phone } = body;
-    const contact = {
-      name,
-      email,
-      phone,
-    };
-    const data = await Contact.create(contact);
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
-};
+    const { contactId } = req.params;
+    if (
+      req.body === "" ||
+      Object.keys(req.body).length === 0 ||
+      req.body === undefined
+    ) {
+      return res.status(400).send({ message: "missing fields" });
+    }
 
-const updateContact = async (contactId, body) => {
-  try {
-    const { name, email, phone } = body;
-    const contact = {
-      name,
-      email,
-      phone,
-    };
-
-    const data = await Contact.findByIdAndUpdate(contactId, contact, {
+    const data = await Contact.findByIdAndUpdate(contactId, req.body, {
       new: true,
     });
-    return data;
+
+    if (data !== null) {
+      res.status(200).send(data);
+    } else {
+      next();
+    }
   } catch (error) {
     console.log(error);
   }
 };
 
-const updateStatusContact = async (contactId, body) => {
+const updateStatusContact = async (req, res, next) => {
   try {
+    const { contactId } = req.params;
     const data = await Contact.findByIdAndUpdate(
       contactId,
-      { favorite: body.favorite },
+      { favorite: req.body.favorite },
       { new: true }
     );
 
-    return data;
+    if (data !== null) {
+      res.status(200).send(data);
+    } else {
+      next();
+    }
   } catch (error) {
     console.log(error);
   }
