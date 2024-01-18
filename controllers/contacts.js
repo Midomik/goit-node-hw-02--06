@@ -11,6 +11,7 @@ const listContacts = async (req, res, next) => {
     }
   } catch (error) {
     console.log(error);
+    next();
   }
 };
 
@@ -25,6 +26,7 @@ const getContactById = async (req, res, next) => {
     }
   } catch (error) {
     console.log(error);
+    next();
   }
 };
 
@@ -45,6 +47,7 @@ const addContact = async (req, res, next) => {
     }
   } catch (error) {
     console.log(error);
+    next();
   }
 };
 
@@ -59,6 +62,7 @@ const removeContact = async (req, res, next) => {
     }
   } catch (error) {
     console.log(error);
+    next();
   }
 };
 
@@ -84,6 +88,7 @@ const updateContact = async (req, res, next) => {
     }
   } catch (error) {
     console.log(error);
+    next();
   }
 };
 
@@ -103,6 +108,7 @@ const updateStatusContact = async (req, res, next) => {
     }
   } catch (error) {
     console.log(error);
+    next();
   }
 };
 
