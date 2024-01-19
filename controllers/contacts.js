@@ -46,7 +46,9 @@ const addContact = async (req, res, next) => {
     if (typeof response.error !== "undefined") {
       return res
         .status(400)
-        .send(response.error.details.map((err) => err.message).join(", "));
+        .send({
+          message: response.error.details.map((err) => err.message).join(", "),
+        });
     }
 
     const data = await Contact.create(contact);

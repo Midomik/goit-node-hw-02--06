@@ -7,11 +7,13 @@ const register = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
+
     if (user !== null) {
       return res.status(409).send({ message: "User already register" });
     }
 
     const response = userPostSchema.validate(req.body, { abortEarly: false });
+
     if (typeof response.error !== "undefined") {
       return res
         .status(400)
@@ -19,8 +21,9 @@ const register = async (req, res, next) => {
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-    const data = await User.create({ email, password: passwordHash });
 
+    const data = await User.create({ email, password: passwordHash });
+    console.log(data);
     res
       .status(201)
       .send({ user: { email: data.email, subscription: data.subscription } });
