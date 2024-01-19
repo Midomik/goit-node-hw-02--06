@@ -64,6 +64,13 @@ const addContact = async (req, res, next) => {
 const removeContact = async (req, res, next) => {
   try {
     const { contactId } = req.params;
+    const ownerId = req.user.id;
+    const user = await Contact.findById(contactId);
+
+    if (user.ownerId.toString() !== ownerId) {
+      return next();
+    }
+
     const data = await Contact.findByIdAndDelete(contactId);
     if (data !== null) {
       res.status(200).send(data);
@@ -79,6 +86,14 @@ const removeContact = async (req, res, next) => {
 const updateContact = async (req, res, next) => {
   try {
     const { contactId } = req.params;
+
+    const ownerId = req.user.id;
+    const user = await Contact.findById(contactId);
+
+    if (user.ownerId.toString() !== ownerId) {
+      return next();
+    }
+
     if (
       req.body === "" ||
       Object.keys(req.body).length === 0 ||
@@ -105,11 +120,27 @@ const updateContact = async (req, res, next) => {
 const updateStatusContact = async (req, res, next) => {
   try {
     const { contactId } = req.params;
+
+    const ownerId = req.user.id;
+    const user = await Contact.findById(contactId);
+
+    if (user.ownerId.toString() !== ownerId) {
+      return next();
+    }
+
     const data = await Contact.findByIdAndUpdate(
       contactId,
       { favorite: req.body.favorite },
       { new: true }
     );
+
+    if (
+      req.body === "" ||
+      Object.keys(req.body).length === 0 ||
+      req.body === undefined
+    ) {
+      return res.status(400).send({ message: "missing field favorite" });
+    }
 
     if (data !== null) {
       res.status(200).send(data);

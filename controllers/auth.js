@@ -26,6 +26,7 @@ const register = async (req, res, next) => {
       .send({ user: { email: data.email, subscription: data.subscription } });
   } catch (error) {
     console.log(error);
+    next();
   }
 };
 
@@ -56,12 +57,65 @@ const login = async (req, res, next) => {
       process.env.JWT_SECRET,
       { expiresIn: "5h" }
     );
+
+    await User.findByIdAndUpdate(user._id, { token });
+
     res.send({
       token,
       user: { email: user.email, subscription: user.subscription },
     });
   } catch (error) {
     console.log(error);
+    next();
   }
 };
-module.exports = { register, login };
+
+const logout = async (req, res, next) => {
+  try {
+    const user = await User.findByIdAndUpdate(req.user.id, { token: null });
+    if (!user._id) {
+      return res.status(401).send({ message: "Not authorized" });
+    }
+    res.status(204).send({ message: "Logout" });
+  } catch (error) {
+    next();
+  }
+};
+
+const current = async (req, res, next) => {
+  const authErr = () => {
+    return res.status(401).send({ message: "Not authorized" });
+  };
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (typeof authHeader === "undefined") {
+      console.log(1);
+      return authErr();
+    }
+
+    const [bearer, token] = authHeader.split(" ", 2);
+
+    if (bearer !== "Bearer") {
+      console.log(2);
+
+      return authErr();
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, async (err, decode) => {
+      if (err) {
+        console.log(2);
+        return authErr();
+      }
+
+      const user = await User.findById(decode.id);
+
+      res.send({ email: user.email, subscription: user.subscription });
+    });
+  } catch (error) {
+    console.log(error);
+    next();
+  }
+};
+
+module.exports = { register, login, logout, current };

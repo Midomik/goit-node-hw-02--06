@@ -16,7 +16,11 @@ const userSchema = new mongoose.Schema(
       enum: ["starter", "pro", "business"],
       default: "starter",
     },
-    token: String,
+    token: {
+      type: String,
+      required: true,
+      default: null,
+    },
   },
   { versionKey: false, timestamps: true }
 );
