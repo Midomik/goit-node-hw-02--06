@@ -101,6 +101,14 @@ const updateStatusContact = async (req, res, next) => {
       { new: true }
     );
 
+    if (
+      req.body === "" ||
+      Object.keys(req.body).length === 0 ||
+      req.body === undefined
+    ) {
+      return res.status(400).send({ message: "missing field favorite" });
+    }
+
     if (data !== null) {
       res.status(200).send(data);
     } else {
