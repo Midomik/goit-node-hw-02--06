@@ -17,10 +17,6 @@ const userSchema = new mongoose.Schema(
       default: "starter",
     },
     token: String,
-    owner: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
-    },
   },
   { versionKey: false, timestamps: true }
 );

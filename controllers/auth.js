@@ -45,6 +45,7 @@ const login = async (req, res, next) => {
       return res.status(401).send({ message: "Email or password is incorect" });
     }
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log(isMatch);
     if (!isMatch) {
       console.log("password");
 
