@@ -7,7 +7,7 @@ const jsonParser = express.json();
 
 router.post("/register", jsonParser, register);
 router.post("/login", jsonParser, login);
-router.get("/logout", authMiddleware, logout);
+router.post("/logout", authMiddleware, logout);
 router.get("/current", authMiddleware, current);
 
 module.exports = router;
