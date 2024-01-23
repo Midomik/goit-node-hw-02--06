@@ -3,7 +3,9 @@ const Contact = require("../models/contactsSchema");
 
 const listContacts = async (req, res, next) => {
   try {
-    const data = await Contact.find();
+    const ownerId = req.user.id;
+
+    const data = await Contact.find({ ownerId: ownerId });
     if (data !== null) {
       res.status(200).send(data);
     } else {
@@ -18,7 +20,13 @@ const listContacts = async (req, res, next) => {
 const getContactById = async (req, res, next) => {
   try {
     const { contactId } = req.params;
+    const userId = req.user.id;
     const data = await Contact.findById(contactId);
+
+    if (data.ownerId.toString() !== userId) {
+      return next();
+    }
+
     if (data !== null) {
       res.status(200).send(data);
     } else {
@@ -31,15 +39,19 @@ const getContactById = async (req, res, next) => {
 };
 
 const addContact = async (req, res, next) => {
+  const contact = { ...req.body, ownerId: req.user.id };
+  console.log(contact);
   try {
-    const response = postSchema.validate(req.body, { abortEarly: false });
+    const response = postSchema.validate(contact, { abortEarly: false });
     if (typeof response.error !== "undefined") {
       return res
         .status(400)
-        .send(response.error.details.map((err) => err.message).join(", "));
+        .send({
+          message: response.error.details.map((err) => err.message).join(", "),
+        });
     }
 
-    const data = await Contact.create(req.body);
+    const data = await Contact.create(contact);
     if (data !== null) {
       res.status(201).send(data);
     } else {
@@ -54,6 +66,13 @@ const addContact = async (req, res, next) => {
 const removeContact = async (req, res, next) => {
   try {
     const { contactId } = req.params;
+    const ownerId = req.user.id;
+    const user = await Contact.findById(contactId);
+
+    if (user.ownerId.toString() !== ownerId) {
+      return next();
+    }
+
     const data = await Contact.findByIdAndDelete(contactId);
     if (data !== null) {
       res.status(200).send(data);
@@ -69,6 +88,14 @@ const removeContact = async (req, res, next) => {
 const updateContact = async (req, res, next) => {
   try {
     const { contactId } = req.params;
+
+    const ownerId = req.user.id;
+    const user = await Contact.findById(contactId);
+
+    if (user.ownerId.toString() !== ownerId) {
+      return next();
+    }
+
     if (
       req.body === "" ||
       Object.keys(req.body).length === 0 ||
@@ -95,6 +122,14 @@ const updateContact = async (req, res, next) => {
 const updateStatusContact = async (req, res, next) => {
   try {
     const { contactId } = req.params;
+
+    const ownerId = req.user.id;
+    const user = await Contact.findById(contactId);
+
+    if (user.ownerId.toString() !== ownerId) {
+      return next();
+    }
+
     const data = await Contact.findByIdAndUpdate(
       contactId,
       { favorite: req.body.favorite },
