@@ -1,11 +1,12 @@
 const fs = require("node:fs/promises");
 const path = require("node:path");
 const User = require("../models/userSchema");
+const Jimp = require("jimp");
 
 const getAvatar = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
-    console.log(23423);
+
     if (user === null) {
       return res.status(404).send({ message: "User not found" });
     }
@@ -23,10 +24,27 @@ const getAvatar = async (req, res, next) => {
 
 const uploadAvatar = async (req, res, next) => {
   try {
-    await fs.rename(
-      req.file.path,
-      path.join(__dirname, "..", "public/avatar", req.file.filename)
-    );
+    const avatarPath = req.file.path;
+    console.log(avatarPath);
+
+    Jimp.read(avatarPath)
+      .then((avatar) => {
+        avatar
+          .resize(250, 250)
+          .write(
+            path.join(__dirname, "..", "public/avatar", req.file.filename)
+          );
+        fs.unlink(avatarPath);
+      })
+      .catch((err) => {
+        console.log(err);
+        next();
+      });
+
+    // await fs.rename(
+    //   req.file.path,
+    //   path.join(__dirname, "..", "public/avatar", req.file.filename)
+    // );
 
     const user = await User.findByIdAndUpdate(
       req.user.id,

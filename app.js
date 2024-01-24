@@ -8,14 +8,12 @@ const userRouter = require("./routes/api/users");
 const authMiddleware = require("./middleware/auth");
 
 const app = express();
-// app.get("/books/1", (req, res) => {
-//   res.send("bababuchka");
-// });
+
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 
 app.use(logger(formatsLogger));
 app.use(cors());
-// app.use(express.json());
+
 app.use("/api/users", authRouter);
 app.use("/api/contacts", authMiddleware, contactsRouter);
 app.use("/api/avatar", authMiddleware, userRouter);
