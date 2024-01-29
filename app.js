@@ -14,9 +14,9 @@ const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 app.use(logger(formatsLogger));
 app.use(cors());
 
-app.use("/api/users", authRouter);
-app.use("/api/contacts", authMiddleware, contactsRouter);
-app.use("/api/avatar", authMiddleware, userRouter);
+app.use("/users", authRouter);
+app.use("/contacts", authMiddleware, contactsRouter);
+app.use("/users/avatars", authMiddleware, userRouter);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Not found" });
