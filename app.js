@@ -15,7 +15,7 @@ app.use(logger(formatsLogger));
 app.use(cors());
 
 app.use("/users", authRouter);
-app.use("/contacts", authMiddleware, contactsRouter);
+app.use("/api/contacts", authMiddleware, contactsRouter);
 app.use("/users/avatars", authMiddleware, userRouter);
 
 app.use((req, res) => {
