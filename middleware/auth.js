@@ -9,21 +9,16 @@ const auth = (req, res, next) => {
   };
 
   if (typeof authHeader === "undefined") {
-    console.log(1);
-
     return errToken();
   }
   const [bearer, token] = authHeader.split(" ", 2);
 
   if (bearer !== "Bearer") {
-    console.log(2);
-
     return errToken();
   }
 
   jwt.verify(token, process.env.JWT_SECRET, async (err, decode) => {
     if (err) {
-      console.log(3);
       return errToken();
     }
 
@@ -37,6 +32,9 @@ const auth = (req, res, next) => {
       return errToken();
     }
 
+    if (user.verify === false) {
+      return res.status(401).send({ message: "Your account isn't verifeid" });
+    }
     req.user = {
       id: decode.id,
       email: decode.email,
